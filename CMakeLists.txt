@@ -6,9 +6,9 @@ set(LIB_NAME exactextract)
 set(BIN_NAME exactextract_bin)
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS 1)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-
 
 include(CTest)
 include(GNUInstallDirs)
@@ -81,7 +81,7 @@ if(BUILD_CLI)
     endif()
 
     #Configure the exactextract CLI target
-    add_library(exactextract_gdal OBJECT
+    add_library(exactextract_gdal STATIC
         src/deferred_gdal_writer.h
         src/deferred_gdal_writer.cpp
         src/gdal_raster_wrapper.h
@@ -153,6 +153,27 @@ if(BUILD_CLI)
             RUNTIME
             DESTINATION bin)
 
+    set(EG_PUBLIC_HEADERS
+        src/deferred_gdal_writer.h
+        src/gdal_raster_wrapper.h
+        src/gdal_dataset_wrapper.h
+        src/gdal_feature.h
+        src/gdal_feature_unnester.h
+        src/gdal_writer.h
+        src/utils_cli.h
+    )
+
+    set_target_properties(exactextract_gdal PROPERTIES PUBLIC_HEADER "${EG_PUBLIC_HEADERS}")
+    install(TARGETS exactextract_gdal
+            EXPORT ${LIB_NAME}-targets
+            LIBRARY
+            DESTINATION exactextract_gdal/lib
+            ARCHIVE
+            DESTINATION exactextract_gdal/lib
+            PUBLIC_HEADER
+            DESTINATION exactextract_gdal/include
+            )
+
     add_test(NAME "cli_tests" 
              COMMAND pytest ${CMAKE_CURRENT_LIST_DIR}/test)
 
@@ -219,8 +240,45 @@ set(PROJECT_SOURCES
         src/variance.h
         ${SRC_GENERATED}/version.h
         )
+set(PROJECT_HEADERS 
+        src/measures.h
+        src/box.h
+        src/cell.h
+        src/coordinate.h
+        src/crossing.h
+        src/feature.h
+        src/feature_sequential_processor.h
+        src/feature_source.h
+        src/floodfill.h
+        src/geos_utils.h
+        src/grid.h
+        src/matrix.h
+        src/map_feature.h
+        src/memory_raster_source.h
+        src/perimeter_distance.h
+        src/processor.h
+        src/raster.h
+        src/raster_area.h
+        src/raster_cell_intersection.h
+        src/raster_sequential_processor.h
+        src/raster_stats.h
+        src/raster_coverage_iterator.h
+        src/side.h
+        src/traversal.h
+        src/traversal_areas.h
+        src/output_writer.h
+        src/operation.h
+        src/raster_source.h
+        src/stats_registry.h
+        src/utils.h
+        src/weighted_quantiles.h
+        src/variance.h
+        ${SRC_GENERATED}/version.h
+        )
 
-add_library(${LIB_NAME} ${PROJECT_SOURCES})
+add_library(${LIB_NAME} STATIC ${PROJECT_SOURCES})
+# set includs
+set_target_properties(${LIB_NAME} PROPERTIES PUBLIC_HEADER "${PROJECT_HEADERS}")
 
 
 # Check matrix bounds for debug builds
@@ -247,6 +305,16 @@ target_link_libraries(
 )
 
 set_target_properties(${LIB_NAME} PROPERTIES OUTPUT_NAME ${LIB_NAME})
+
+install(TARGETS ${LIB_NAME}
+        EXPORT ${LIB_NAME}-targets
+        LIBRARY
+        DESTINATION ${LIB_NAME}/lib
+        ARCHIVE
+        DESTINATION ${LIB_NAME}/lib
+        PUBLIC_HEADER
+        DESTINATION ${LIB_NAME}/include
+        )
 
 if (BUILD_PYTHON)
     add_subdirectory(python)
