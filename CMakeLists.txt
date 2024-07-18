@@ -151,7 +151,7 @@ if(BUILD_CLI)
 
     install(TARGETS ${BIN_NAME}
             RUNTIME
-            DESTINATION bin)
+            DESTINATION ${LIB_NAME}/bin)
 
     set(EG_PUBLIC_HEADERS
         src/deferred_gdal_writer.h

@@ -91,7 +91,7 @@ GDALDatasetWrapper::set_select(const std::vector<std::string>& cols)
         }
         sql << cols[i];
     }
-    sql << " FROM " << layer_name;
+    sql << " FROM " << "\"" << layer_name << "\"";
 
     std::string sql_str = sql.str();
 
