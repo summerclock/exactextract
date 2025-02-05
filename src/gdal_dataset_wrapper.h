@@ -15,6 +15,7 @@
 #define EXACTEXTRACT_GDAL_DATASET_WRAPPER_H
 
 #include <gdal.h>
+#include <ogr_srs_api.h>
 #include <geos_c.h>
 #include <string>
 
@@ -26,7 +27,7 @@ namespace exactextract {
 
         bool next();
 
-        GEOSGeometry* feature_geometry(const GEOSContextHandle_t &geos_context) const;
+        GEOSGeometry* feature_geometry(const GEOSContextHandle_t &geos_context, OGRSpatialReferenceH srs = nullptr) const;
 
         std::string feature_field(const std::string &field_name) const;
 

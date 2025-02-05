@@ -15,6 +15,7 @@
 #define EXACTEXTRACT_GDAL_RASTER_WRAPPER_H
 
 #include "box.h"
+#include "gdal.h"
 #include "grid.h"
 #include "raster.h"
 
@@ -37,6 +38,8 @@ namespace exactextract {
 
         GDALRasterWrapper(const GDALRasterWrapper &) = delete;
         GDALRasterWrapper(GDALRasterWrapper &&) noexcept;
+        
+        void* GetRaster() override;
     private:
         using GDALDatasetH=void*;
         using GDALRasterBandH=void*;

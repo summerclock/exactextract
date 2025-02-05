@@ -26,7 +26,7 @@ namespace exactextract {
     public:
         using Processor::Processor;
 
-        void read_features();
+        void read_features(OGRSpatialReferenceH srs = nullptr);
         void populate_index();
 
         void process() override;

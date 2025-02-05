@@ -33,8 +33,20 @@ namespace exactextract {
         m_band = band;
         m_nodata_value = nodata_value;
         m_has_nodata = static_cast<bool>(has_nodata);
+
+        if (!m_has_nodata) {
+            // log warning and assume nodatavalue as 0
+            std::cerr << "Warning: " << filename << " has no nodata value. Assuming 0." << std::endl;
+            m_nodata_value = 0;
+            m_has_nodata = true;
+        }
+        
         set_name(filename);
         compute_raster_grid();
+    }
+
+    void* GDALRasterWrapper::GetRaster(){
+        return m_rast;
     }
     
     GDALRasterWrapper::~GDALRasterWrapper() {

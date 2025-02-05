@@ -12,18 +12,22 @@
 // limitations under the License.
 
 #include "raster_sequential_processor.h"
+#include "gdal.h"
 
 #include <map>
 #include <memory>
+#include <ogr_api.h>
+#include <ogr_spatialref.h>
+#include <ogr_srs_api.h>
 #include <set>
 
 namespace exactextract {
 
-    void RasterSequentialProcessor::read_features() {
+    void RasterSequentialProcessor::read_features(OGRSpatialReferenceH srs) {
         while (m_shp.next()) {
             Feature feature = std::make_pair(
                     m_shp.feature_field(m_shp.id_field()),
-                    geos_ptr(m_geos_context, m_shp.feature_geometry(m_geos_context)));
+                    geos_ptr(m_geos_context, m_shp.feature_geometry(m_geos_context, srs)));
             m_features.push_back(std::move(feature));
         }
     }
@@ -36,8 +40,11 @@ namespace exactextract {
     }
 
     void RasterSequentialProcessor::process() {
-        read_features();
+        const auto* proj_ref = GDALGetProjectionRef(m_operations.at(0).values->GetRaster());
+        OGRSpatialReferenceH srs = OSRNewSpatialReference(proj_ref);
+        read_features(srs);
         populate_index();
+        OSRRelease(srs);
 
         for (const auto& op : m_operations) {
             m_output.add_operation(op);

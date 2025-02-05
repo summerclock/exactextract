@@ -59,8 +59,13 @@ namespace exactextract {
         return m_feature != nullptr;
     }
 
-    GEOSGeometry* GDALDatasetWrapper::feature_geometry(const GEOSContextHandle_t &geos_context) const {
+    GEOSGeometry* GDALDatasetWrapper::feature_geometry(const GEOSContextHandle_t &geos_context, OGRSpatialReferenceH srs) const {
         OGRGeometryH geom = OGR_F_GetGeometryRef(m_feature);
+
+        if (srs != nullptr && !OSRIsSame(OGR_G_GetSpatialReference(geom), srs)) {
+            // transform the geometry srs to dataset srs
+            OGR_G_TransformTo(geom, srs);
+        }
 
         auto sz = static_cast<size_t>(OGR_G_WkbSize(geom));
         auto buff = std::make_unique<unsigned char[]>(sz);

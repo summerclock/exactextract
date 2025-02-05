@@ -15,6 +15,7 @@
 #define EXACTEXTRACT_RASTER_SOURCE_H
 
 #include "box.h"
+#include "gdal.h"
 #include "grid.h"
 #include "raster.h"
 
@@ -34,6 +35,8 @@ namespace exactextract {
         std::string name() const {
             return m_name;
         }
+
+        virtual void* GetRaster() = 0;
 
     private:
         std::string m_name;
